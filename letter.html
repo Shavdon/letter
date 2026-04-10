@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>For My Love ❤️</title>
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Poppins:wght@300;400&display=swap" rel="stylesheet">
+<style>
+body { margin:0;height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;background:linear-gradient(135deg,#ff9a9e,#fad0c4,#ffdde1);font-family:'Poppins',sans-serif;overflow:hidden; }
+.container { position:relative;text-align:center;margin-bottom:30px; }
+.envelope { width:250px;height:160px;background:#ff6b81;position:relative;cursor:pointer;border-radius:10px;transition:transform .5s; }
+.envelope:hover { transform:scale(1.05); }
+.flap { position:absolute;width:100%;height:100%;background:#ff4757;clip-path:polygon(0 0,100% 0,50% 50%);transform-origin:top;transition:transform .8s ease; }
+.letter { position:absolute;width:90%;height:150px;background:white;top:10px;left:5%;border-radius:8px;padding:15px;box-sizing:border-box;transform:translateY(80px);opacity:0;transition:all 1s ease;overflow-y:auto; }
+.open .flap { transform:rotateX(180deg); }
+.open .letter { transform:translateY(-130px);opacity:1; }
+h1 { font-family:'Great Vibes',cursive;color:#ff4757; }
+p { font-size:14px;color:#333; }
+.hearts { position:absolute;width:100%;height:100%;pointer-events:none; }
+.heart { position:absolute;animation:float 5s infinite ease-in; }
+@keyframes float { 0%{transform:translateY(0) scale(1);opacity:1;}100%{transform:translateY(-600px) scale(1.5);opacity:0;} }
+.wishlist { background:rgba(255,255,255,.9);padding:15px;border-radius:15px;width:260px;box-shadow:0 8px 20px rgba(0,0,0,.1); }
+.wishlist h2 { margin-top:0;color:#ff4757; }
+input,button { padding:8px;margin:5px 0;width:100%;border-radius:8px;border:1px solid #ccc; }
+button { background:#ff6b81;color:white;cursor:pointer; }
+button:hover { background:#ff4757; }
+ul { list-style:none;padding:0;max-height:120px;overflow-y:auto; }
+li { font-size:13px;margin:5px 0;display:flex;justify-content:space-between; }
+.total { font-weight:bold;color:#333; }
+.warning { color:red;font-size:12px; }
+.remove { background:none;border:none;color:#ff4757;cursor:pointer; }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="envelope" onclick="openEnvelope()" id="envelope">
+    <div class="flap"></div>
+    <div class="letter">
+      <h1>My Love ❤️</h1>
+      <p>
+        Every moment with you feels like something straight out of a dream I never want to wake up from.
+        You bring a kind of happiness into my life that I didn’t even know I was missing.
+        <br><br>
+        I love your smile, your energy, your presence… everything about you just feels right to me.
+        You’re not just someone I care about—you’re my person.
+        <br><br>
+        No matter what life throws at us, I’m always going to stand beside you, love you, and choose you every single day.
+        <br><br>
+        I love you more than words can ever fully explain 💕
+      </p>
+    </div>
+  </div>
+</div>
+
+<div class="wishlist">
+  <h2>Our Wishlist 💝</h2>
+  <input type="text" id="item" placeholder="Gift idea">
+  <input type="number" id="price" placeholder="Price ($)">
+  <button onclick="addItem()">Add</button>
+  <ul id="list"></ul>
+  <div class="total">Total: $<span id="total">0</span> / $100</div>
+  <div class="warning" id="warning"></div>
+</div>
+
+<div class="hearts" id="hearts"></div>
+
+<script>
+let wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
+let total = 0;
+
+function openEnvelope(){ document.getElementById('envelope').classList.toggle('open'); }
+
+function createHeart(){
+  const heart=document.createElement('div');
+  heart.classList.add('heart');
+  heart.innerHTML=['💖','💕','💗','💘'][Math.floor(Math.random()*4)];
+  heart.style.left=Math.random()*100+'vw';
+  heart.style.fontSize=(Math.random()*20+20)+'px';
+  heart.style.animationDuration=(Math.random()*3+3)+'s';
+  document.getElementById('hearts').appendChild(heart);
+  setTimeout(()=>heart.remove(),5000);
+}
+setInterval(createHeart,300);
+
+function saveData(){
+  localStorage.setItem('wishlist', JSON.stringify(wishlist));
+}
+
+function renderList(){
+  const list=document.getElementById('list');
+  list.innerHTML='';
+  total=0;
+
+  wishlist.forEach((item,index)=>{
+    total+=item.price;
+    const li=document.createElement('li');
+    li.innerHTML=`${item.name} - $${item.price} <button class="remove" onclick="removeItem(${index})">❌</button>`;
+    list.appendChild(li);
+  });
+
+  document.getElementById('total').innerText=total;
+}
+
+function addItem(){
+  const item=document.getElementById('item').value;
+  const price=parseFloat(document.getElementById('price').value);
+  const warning=document.getElementById('warning');
+
+  if(!item || isNaN(price)) return;
+
+  if(total + price > 100){
+    warning.innerText="Budget exceeded! 💔 Keep it under $100";
+    return;
+  }
+
+  warning.innerText="";
+  wishlist.push({name:item,price:price});
+  saveData();
+  renderList();
+
+  document.getElementById('item').value='';
+  document.getElementById('price').value='';
+}
+
+function removeItem(index){
+  wishlist.splice(index,1);
+  saveData();
+  renderList();
+}
+
+// Load saved data on start
+renderList();
+</script>
+
+</body>
+</html>
